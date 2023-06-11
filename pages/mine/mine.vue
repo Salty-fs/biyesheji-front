@@ -10,12 +10,12 @@
 		</view>
 		<view class="info">
 			<view class="readtime">
-				阅读时间          13
+				阅读时间          {{time}}min
 			</view>
-			<view class="opr">
+			<!-- <view class="opr">
 				
 				<OprButton v-for='i in info' :info = "i"/>
-			</view>
+			</view> -->
 			<view class="opr">
 				<text>关于我们</text>
 				<text>免责声明</text>
@@ -30,7 +30,9 @@
 	import { computed, reactive, ref } from 'vue'
 	import { storeToRefs } from "pinia";
 
-	const {userInfo, isLogin} = storeToRefs(useLoginStore());	
+	const {userInfo, isLogin} = storeToRefs(useLoginStore());
+	
+	const time = ref(0)
 	
 	const wxcode = () => {
 		return new Promise(function(resolve, reject) {
@@ -84,7 +86,9 @@
 	  temp.uid = user.openid;
 	  useLoginStore().storeLogin(temp);
 	  let param = await request(`http://localhost:3000/user/${user.openid}`);
-	  console.log(temp);
+	  console.log(param);
+	  time.value = param.time
+	  console.log(time);
 	  if (!param) {
 	    uni.request({
 	      url: 'http://localhost:3000/user/new',

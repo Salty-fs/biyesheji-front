@@ -5,8 +5,10 @@
 			<view class="phare" v-for="item,index in info">
 				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{item}}
 			</view>
-			<view class="uni-padding-wrap uni-common-mt">
-				<uni-segmented-control :values="items" @clickItem="onClickItem" />
+			<view class="btn">
+				<!-- <uni-segmented-control :values="items" @clickItem="onClickItem" /> -->
+				<button type="default" size="default" @click="changeSeq(0)">上一章</button>
+				<button type="default" size="default" @click="changeSeq(1)">下一章</button>
 			</view>
 		</scroll-view>
 	</view>
@@ -24,8 +26,6 @@
 				bookseq: 1,
 				info: [],
 				name: '',
-				items: ['上一章', '下一章'],
-				current: 0
 			};
 		},
 		onLoad(option) {
@@ -43,33 +43,40 @@
 				uni.request({
 					url:`http://localhost:3000/chapter/getBookChapterInfo?bid=${this.bookid}&list=${this.bookseq}&uid=${userInfo.uid}`,
 					success: (res) => {
+						if(!res.data[0]){
+							uni.showToast({
+								title:'已到最后一页',
+								icon: 'error'
+							})
+							this.bookseq = parseInt(this.bookseq) - 1
+							return
+						}
 						this.info = res.data[0].info.split('	')
 						this.name = res.data[0].name
 					}
 				})
 			},
 			
-			onClickItem(e) {
-				if (this.current !== e.currentIndex) {
-					this.current = e.currentIndex
-				}
-				if(this.current == 0){
-					if(this.bookseq >= 2){
-						this.bookseq = parseInt(this.bookseq) - 1
-						this.getBookContent()
-						uni.pageScrollTo({
-						    scrollTop: 0,
-						    duration: 100,
-						});
+			changeSeq(state) {
+				if(state == 0){
+					this.bookseq = parseInt(this.bookseq) - 1
+					if(this.bookseq < 1) {
+						this.bookseq = 1
+						uni.showToast({
+							title:'已是第一页',
+							icon: 'error'
+						})
+						// break;
+						return
 					}
 				} else {
 					this.bookseq = parseInt(this.bookseq) + 1
-					this.getBookContent()
-					uni.pageScrollTo({
-					    scrollTop: 0,
-					    duration: 100,
-					});
 				}
+				this.getBookContent()
+				uni.pageScrollTo({
+				    scrollTop: 0,
+				    duration: 100,
+				});
 			},
 		}
 	}
@@ -91,6 +98,14 @@
 			.phare{
 				margin-inline: 40rpx;
 				font-size: 35rpx;
+			}
+			.btn{
+				display: flex;
+				flex-direction: row;
+				justify-content: center;
+				align-items: center;
+				margin-top: 20rpx;
+				padding-bottom: 80rpx ;
 			}
 		}
 	}

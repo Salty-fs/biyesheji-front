@@ -61,6 +61,12 @@
 			this.getBookBasic(),
 			this.iscollect()
 		},
+		onShow(){
+			this.getMulv()
+			this.getPinglun(),
+			this.getBookBasic(),
+			this.iscollect()
+		},
 		methods: {
 			onChange(e){
 				uni.navigateTo({
